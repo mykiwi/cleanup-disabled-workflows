@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   main:
+    runs-on: ubuntu-latest
     steps:
       - uses: mykiwi/cleanup-disabled-workflows@v1
 ```
