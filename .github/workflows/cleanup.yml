@@ -1,5 +1,7 @@
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - example-clean
 
 permissions:
   actions: write
