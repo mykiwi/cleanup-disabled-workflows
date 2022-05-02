@@ -9,12 +9,19 @@ branding:
 name: 'Cleanup disabled workflows'
 description: 'Automate the cleaning of your disabled workflows'
 
+inputs:
+  github-token:
+    description: 'Custom GitHub Token, to not be rate limited to 1,000 requests' # see https://docs.github.com/en/rest/overview/resources-in-the-rest-api#requests-from-github-actions
+    required: false
+    default: ${{ github.token }}
+
 runs:
   using: "composite"
   steps:
 
     - uses: actions/github-script@v6
       with:
+        github-token: ${{ inputs.github-token }}
         script: |
           const githubContext = {
             owner: context.repo.owner,
