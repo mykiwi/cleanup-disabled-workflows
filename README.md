@@ -1,4 +1,4 @@
-# GitHub Action cleanup disabled workflows
+# GitHub Actions: cleanup disabled workflows
 
 ## Usage
 
