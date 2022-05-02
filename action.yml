@@ -21,32 +21,35 @@ runs:
             repo: context.repo.repo,
           }
 
-          const workflows = await github.rest.actions
-            .listRepoWorkflows(githubContext)
-            .then(response => response.data.workflows.filter(workflow => workflow.state == 'disabled_manually'))
+          const disabledWorkflows = await github.paginate(
+            github.rest.actions.listRepoWorkflows,
+            githubContext
+          ).then(workflows => workflows.filter(workflow => workflow.state == 'disabled_manually'))
 
           console.log('::group::List of disabled workflows')
-          console.log(workflows)
+          console.log(disabledWorkflows)
           console.log('::endgroup::')
 
-          for (const workflow of workflows) {
-            const {data: {workflow_runs}} = await github.rest.actions
-              .listWorkflowRuns({
+          for (const workflow of disabledWorkflows) {
+            const runs = await github.paginate(
+              github.rest.actions.listWorkflowRuns,
+              {
                 ...githubContext,
                 workflow_id: workflow.id,
-              })
+              }
+            )
 
             console.log(`::group::Workflow #${workflow.id} >> Runs`)
-            console.log(workflow_runs)
+            console.log(runs)
             console.log('::endgroup::')
             
-            for (const workflow_run of workflow_runs) {
+            for (const run of runs) {
               const response = await github.rest.actions.deleteWorkflowRun({
                 ...githubContext,
-                run_id: workflow_run.id,
+                run_id: run.id,
               })
 
-              console.log(`::group::Workflow #${workflow.id} >> Run #${workflow_run.id} >> Delete`)
+              console.log(`::group::Workflow #${workflow.id} >> Run #${run.id} >> Delete`)
               console.log(response)
               console.log('::endgroup::')
             }
