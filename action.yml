@@ -14,6 +14,9 @@ inputs:
     description: 'Custom GitHub Token, to not be rate limited to 1,000 requests' # see https://docs.github.com/en/rest/overview/resources-in-the-rest-api#requests-from-github-actions
     required: false
     default: ${{ github.token }}
+  summarize:
+    description: 'Show which workflows would be deleted (without actually deleting them)'
+    default: false
 
 runs:
   using: "composite"
@@ -36,6 +39,11 @@ runs:
           console.log('::group::List of disabled workflows')
           console.log(disabledWorkflows)
           console.log('::endgroup::')
+
+          if (${{ inputs.summarize }} || ${{ inputs.summarize }} == 'true') {
+            console.log('Exiting early (summarize is set to true)')
+            process.exit(0)
+          }
 
           for (const workflow of disabledWorkflows) {
             const runs = await github.paginate(
